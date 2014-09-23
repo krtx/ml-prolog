@@ -32,7 +32,8 @@ variable([X | Y]) --> [X], {code_type(X, alpha)}, variable_(Y).
 variable_([]) --> [].
 variable_([X | Y]) --> [X], {code_type(X, csym); [X] = `'`}, variable_(Y). %% '
 
-%% Expression    
+%% Expression
+%% refered to mParser (https://bitbucket.org/cakeplus/mparser)
 
 addf(X, Y, binop(add, X, Y)).
 subf(X, Y, binop(sub, X, Y)).
