@@ -1,13 +1,10 @@
 
-:- cd('/Users/kinoshita/work/prolog/ml/').
+:- module(eval, [eval/3]).
 
-:- use_module(parser).
-:- use_module(typing).
+assoc(Y, [(X, _) | Rest], V) :- X \= Y, !, assoc(Y, Rest, V).
+assoc(X, [(X, V) | _], V).
 
-assoc(Y, [(X , _) | Rest], V) :- X \= Y, !, assoc(Y, Rest, V).
-assoc(X, [(X , V) | _], V).
-
-add_assoc(X, A, V, [[X | V] | A]).
+add_assoc(X, V, A, [(X, V) | A]).
 
 eval(_Env, int(X), int(X)).
 eval(_Env, bool(X), bool(X)).
@@ -18,6 +15,19 @@ eval(Env, if(Cond, Then, Else), E) :-
         (C = true, eval(Env, Then, E));
         (C = false, eval(Env, Else, E))
     ).
+
+eval(Env, let(Id, E1, E2), V) :-
+    eval(Env, E1, V1),
+    add_assoc(Id, V1, Env, NEnv),
+    eval(NEnv, E2, V).
+
+eval(Env, fun(Id, E), proc(Env, Id, E)).
+
+eval(Env, app(E1, E2), V) :-
+    eval(Env, E1, proc(NEnv0, Id, Body)),
+    eval(Env, E2, Arg),
+    add_assoc(Id, Arg, NEnv0, NEnv),
+    eval(NEnv, Body, V).
 
 eval(Env, binop(Op, X, Y), Z) :-
     eval(Env, X, A),
@@ -34,14 +44,3 @@ apply_prim(land, bool(A), bool(B), bool(Z)) :-
 apply_prim(lor, bool(A), bool(B), bool(Z)) :-
     (A = false, B = false, !, Z = false); Z = true.
 
-initial_env([(`i`, int(1)),
-             (`ii`, int(2)),
-             (`iii`, int(3)),
-             (`iv`, int(4)),
-             (`v`, int(5)),
-             (`x`, int(10))]).
-
-main(Input, Output) :-
-    initial_env(E),
-    parser(Input, Ast),
-    eval(E, Ast, Output).

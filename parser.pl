@@ -8,9 +8,14 @@ reserved(`false`).
 reserved(`if`).
 reserved(`then`).
 reserved(`else`).
+reserved(`let`).
+reserved(`in`).
+reserved(`fun`).
 
 boolean(true) --> "true".
 boolean(false) --> "false".
+
+blanks1 --> blank, blanks.
 
 term(int(X)) --> integer(X).
 term(bool(X)) --> boolean(X).
@@ -25,15 +30,31 @@ term(if(Cond, Then, Else)) -->
     "else", blanks,
     expression(Else).
 
-term(var(X)) --> variable(X), {not(reserved(X))}.
+term(let(Id, E1, E2)) -->
+    "let", blanks,
+    variable(Id), blanks,
+    "=", blanks,
+    expression(E1), blanks,
+    "in", blanks,
+    expression(E2).
 
-variable([X | Y]) --> [X], {code_type(X, alpha)}, variable_(Y).
+term(fun(Id, E)) -->
+    "fun", blanks,
+    variable(Id), blanks,
+    "->", blanks,
+    expression(E).
 
+term(var(X)) --> variable(X).
+
+variable(Z) -->
+    [X], {code_type(X, alpha)}, !, variable_(Y),
+    {Z = [X | Y], not(reserved(Z))}, !.
+
+variable_([X | Y]) --> [X], {code_type(X, csym); [X] = `'`}, !, variable_(Y). %% '
 variable_([]) --> [].
-variable_([X | Y]) --> [X], {code_type(X, csym); [X] = `'`}, variable_(Y). %% '
+
 
 %% Expression
-%% refered to mParser (https://bitbucket.org/cakeplus/mparser)
 
 addf(X, Y, binop(add, X, Y)).
 subf(X, Y, binop(sub, X, Y)).
@@ -56,24 +77,35 @@ fold_left(F, A, [X | Xs], C) :-
     fold_left(F, B, Xs, C).
 
 expression(X) -->
-    {ops(S), fold_left(make_parser, term, S, P)},
+    {ops(S), fold_left(make_parser, application, S, P)},
     call(P, X).
 
-make_parser(Term, _Ops, X) --> call(Term, X).
-make_parser(Term, Ops, Z) --> call(Term, X), blanks, aux(Term, Ops, X, Z).
+%% expression(X) --> application(X), !.
+
+application(Y) --> term(X), application_aux(X, Y).
+
+application_aux(X, W) -->
+    blank,
+    blanks,
+    term(Y), !,
+    application_aux(app(X, Y), W).
+application_aux(X, X) --> [].
+
+make_parser(Term, Ops, Z) --> call(Term, X), aux(Term, Ops, X, Z).
 
 aux(Term, Ops, X, A) -->
-    choice(Ops, Cstr), blanks,
-    call(Term, Y),
-    {call(Cstr, X, Y, A)}.
-
-aux(Term, Ops, X, A) -->
-    choice(Ops, Cstr), blanks,
-    call(Term, Z), blanks,
+    blanks,
+    choice(Ops, Cstr),
+    blanks,
+    call(Term, Z), !,
+    blanks,
     aux(Term, Ops, W, A),
     {call(Cstr, X, Z, W)}.
 
-choice([(Chr, Cstr) | _], Cstr) --> Chr.
+aux(_, _, X, X) --> [].
+
+choice([(Chr, Cstr) | _], Cstr) --> Chr, !.
 choice([_ | Rest], Cstr) --> choice(Rest, Cstr).
 
 parser(X, Y) :- phrase(expression(Y), X).
+
