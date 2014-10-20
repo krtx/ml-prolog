@@ -15,8 +15,6 @@ reserved(`fun`).
 boolean(true) --> "true".
 boolean(false) --> "false".
 
-blanks1 --> blank, blanks.
-
 term(int(X)) --> integer(X).
 term(bool(X)) --> boolean(X).
 
@@ -65,10 +63,10 @@ landf(X, Y, binop(land, X, Y)).
 lorf(X, Y, binop(lor, X, Y)).
 
 ops([
-       [("*", mulf), ("/", divf)],
-       [("+", addf), ("-", subf)],
-       [("<", ltf)],
-       [("&&", landf), ("||", lorf)]
+           [("*", mulf), ("/", divf)],
+           [("+", addf), ("-", subf)],
+           [("<", ltf)],
+           [("&&", landf), ("||", lorf)]
    ]).
 
 fold_left(_, A, [], A).
