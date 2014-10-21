@@ -8,6 +8,18 @@ infer(TyEnv, var(X), Ty) :-
     assoc(X, TyEnv, (Bound, Ty0)),
     instanciate(Bound, Ty0, Ty).
 
+%% instanciate (Bound, X) and unify with Y
+unify_var(Bound, X, Y) :-
+    (var(X), !, (X in Bound, !, copy_term(X, X0), X0 = Y;
+                 X = Y)
+    );
+    (X = arrow(X0, X1), !, Y = arrow(Y0, Y1),
+     unify_var(Bound, X0, Y0), unify_var(Bound, X1, Y1));
+    X = Y.
+
+infer(TyEnv, var(X), Ty) :-
+    assoc(X, TyEnv, (Bound, Ty0)), unify_var(Bound, Ty0, Ty).
+
 infer(_, int(_), int).
 infer(_, bool(_), bool).
 
