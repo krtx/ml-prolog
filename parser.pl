@@ -16,7 +16,7 @@ boolean(true) --> "true".
 boolean(false) --> "false".
 
 term(int(X)) --> integer(X).
-term(bool(X)) --> boolean(X).
+term(bool(X)) -->boolean(X).
 
 term(X) --> "(", blanks, expression(X), blanks, ")".
 
@@ -103,5 +103,5 @@ aux(_, _, X, X) --> [].
 choice([(Chr, Cstr) | _], Cstr) --> Chr, !.
 choice([_ | Rest], Cstr) --> choice(Rest, Cstr).
 
-parser(X, Y) :- phrase(expression(Y), X).
+parser(X, Y) :- phrase(expression(Y), X), !.
 
