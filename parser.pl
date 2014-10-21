@@ -78,8 +78,6 @@ expression(X) -->
     {ops(S), fold_left(make_parser, application, S, P)},
     call(P, X).
 
-%% expression(X) --> application(X), !.
-
 application(Y) --> term(X), application_aux(X, Y).
 
 application_aux(X, W) -->

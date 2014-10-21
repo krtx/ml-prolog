@@ -1,10 +1,12 @@
 
 :- module(eval, [eval/3]).
 
-assoc(Y, [(X, _) | Rest], V) :- X \= Y, !, assoc(Y, Rest, V).
-assoc(X, [(X, V) | _], V).
+:- use_module(utility).
 
-add_assoc(X, V, A, [(X, V) | A]).
+%% assoc(Y, [(X, _) | Rest], V) :- X \= Y, !, assoc(Y, Rest, V).
+%% assoc(X, [(X, V) | _], V).
+
+%% add_assoc(X, V, A, [(X, V) | A]).
 
 eval(_Env, int(X), int(X)).
 eval(_Env, bool(X), bool(X)).
