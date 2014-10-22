@@ -3,16 +3,11 @@
 
 :- use_module(utility).
 
-%% assoc(Y, [(X, _) | Rest], V) :- X \= Y, !, assoc(Y, Rest, V).
-%% assoc(X, [(X, V) | _], V).
-
-%% add_assoc(X, V, A, [(X, V) | A]).
-
 eval(_Env, int(X), int(X)).
 eval(_Env, bool(X), bool(X)).
 eval(Env, var(X), Z) :- assoc(X, Env, Z).
 eval(Env, if(Cond, Then, Else), E) :-
-    eval(Env, Cond, C),
+    eval(Env, Cond, bool(C)),
     (
         (C = true, eval(Env, Then, E));
         (C = false, eval(Env, Else, E))
