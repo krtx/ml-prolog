@@ -4,9 +4,11 @@
 :- use_module(utility).
 :- use_module(typing_aux).
 
+:- set_prolog_flag(occurs_check, true). % prohibit recursive types
+
 infer(TyEnv, var(X), Ty) :-
     assoc(X, TyEnv, (Bound, Ty0)),
-    instanciate(Bound, Ty0, Ty), !.
+    instanciate(Bound, Ty0, Ty1), Ty = Ty1, !.
 
 infer(_, int(_), int) :- !.
 infer(_, bool(_), bool) :- !.
