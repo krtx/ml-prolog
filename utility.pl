@@ -1,10 +1,10 @@
 
 :- module(utility, [op(700, xfx, in), (in)/2,
-                      remove_duplicates/2,
-                      diff/3,
-                      assoc/3,
-                      add_assoc/4,
-                      zip/3]).
+                    remove_duplicates/2,
+                    diff/3,
+                    assoc/3,
+                    add_assoc/4,
+                    zip/3]).
 
 :- op(700, xfx, in).
 
